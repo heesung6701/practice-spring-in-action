@@ -12,25 +12,33 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import lombok.extern.slf4j.Slf4j;
 import tacos.Ingredient;
 import tacos.Ingredient.Type;
+import tacos.Order;
 import tacos.Taco;
 import tacos.data.IngredientRepository;
+import tacos.data.TacoRepository;
 
 @Slf4j
 @Controller
 @RequestMapping("/design")
+@SessionAttributes("order")
 public class DesignTacoController {
 
 	private final IngredientRepository ingredientRepo;
 	
+	private TacoRepository tacoRepo;
+	
 	@Autowired
-	public DesignTacoController(IngredientRepository ingredientRepo) {
+	public DesignTacoController(IngredientRepository ingredientRepo, TacoRepository tacoRepo) {
 		this.ingredientRepo = ingredientRepo;
+		this.tacoRepo = tacoRepo;
 	}
 	
 	@GetMapping
@@ -53,8 +61,18 @@ public class DesignTacoController {
 				.collect(Collectors.toList());
 	}
 	
+	@ModelAttribute(name = "order")
+	public Order order() {
+		return new Order();
+	}
+	
+	@ModelAttribute(name = "taco")
+	public Taco taco() {
+		return new Taco();
+	}
+	
 	@PostMapping
-	public String processDesign(Model model, @Valid Taco design, Errors errors) {
+	public String processDesign(Model model, @Valid Taco design, Errors errors, @ModelAttribute Order order) {
 		if (errors.hasErrors()) {
 			List<Ingredient> ingredients = new ArrayList<>();
 			ingredientRepo.findAll().forEach(i -> ingredients.add(i));
@@ -65,7 +83,8 @@ public class DesignTacoController {
 			}
 			return "design";
 		}
-		log.info("Processing design: " + design);
+		Taco saved = tacoRepo.save(design);
+		order.addDesign(saved);
 		return "redirect:/orders/current";
 	}
 }
