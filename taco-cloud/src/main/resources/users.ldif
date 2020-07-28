@@ -1,0 +1,36 @@
+dn: ou=groups,dc=tacocloud,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: groups
+
+dn: ou=people,dc=tacocloud,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: people
+
+dn: uid=tacocloud,ou=people,dc=tacocloud,dc=com
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: GD Hong
+sn: Hong
+uid: user1
+userPasscode: $2a$10$GqNaEQ1yShbXB701ezDdP.nFPVL7dhiQKXls4k.5ed33Inyt131Ai
+
+dn: uid=tacocloud,ou=people,dc=tacocloud,dc=com
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: MS Park
+sn: Park
+uid: user2
+userPasscode: $2a$10$g5uOmkUfcdCYft.PR89hhusGnjwCYhsrCW07MYSOzIO1noJ/SuyMm
+
+dn: cn=USER,ou=groups,dc=tacocloud,dc=com
+objectclass: top
+objectclass: groupOfNames
+cn: USER
+member: uid=user1,ou=people,dc=tacocloud,dc=com
+member: uid=user2,ou=people,dc=tacocloud,dc=com

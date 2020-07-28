@@ -31,11 +31,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth
-			.jdbcAuthentication()
-		    .dataSource(dataSource)
-		    .usersByUsernameQuery("select username, password, enabled from users where username=?")
-		    .authoritiesByUsernameQuery("select username, authority from authorities where username = ?")
-		    .passwordEncoder(new NoEncodingPasswordEncoder());
+		auth.ldapAuthentication()
+		.userSearchBase("ou=people")
+		.userSearchFilter("(uid={0})")
+		.groupSearchBase("ou=groups")
+		.groupSearchFilter("member={0}")
+		.contextSource()
+		.root("dc=tacocloud,dc=com")
+		.ldif("classpath:users.ldif")
+		.and()
+		.passwordCompare()
+		.passwordEncoder(new BCryptPasswordEncoder())
+		.passwordAttribute("userPasscode");
 	}
 }
