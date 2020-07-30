@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -58,6 +59,7 @@ public class DesignTacoController {
 		}
 		String username = principal.getName();
 		User user = userRepo.findByUsername(username);
+		if(user==null) return "redirect:/login";
 		model.addAttribute("user", user);
 		return "design";
 	}
@@ -80,7 +82,7 @@ public class DesignTacoController {
 	}
 	
 	@PostMapping
-	public String processDesign(Model model, @Valid Taco design, Errors errors, @ModelAttribute Order order) {
+	public String processDesign(Model model, @Valid Taco design, Errors errors, @ModelAttribute Order order, @AuthenticationPrincipal User user) {
 		if (errors.hasErrors()) {
 			List<Ingredient> ingredients = new ArrayList<>();
 			ingredientRepo.findAll().forEach(i -> ingredients.add(i));
@@ -89,6 +91,7 @@ public class DesignTacoController {
 			for (Type type : types) {
 				model.addAttribute(type.toString().toLowerCase(), filterByType(ingredients, type));
 			}
+			model.addAttribute("user", user);
 			return "design";
 		}
 		Taco saved = tacoRepo.save(design);
