@@ -1,5 +1,6 @@
 package tacos.web;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,8 +23,10 @@ import tacos.Ingredient;
 import tacos.Ingredient.Type;
 import tacos.Order;
 import tacos.Taco;
+import tacos.User;
 import tacos.data.IngredientRepository;
 import tacos.data.TacoRepository;
+import tacos.data.UserRepository;
 
 @Slf4j
 @Controller
@@ -35,14 +38,17 @@ public class DesignTacoController {
 	
 	private TacoRepository tacoRepo;
 	
+	private UserRepository userRepo;
+	
 	@Autowired
-	public DesignTacoController(IngredientRepository ingredientRepo, TacoRepository tacoRepo) {
+	public DesignTacoController(IngredientRepository ingredientRepo, TacoRepository tacoRepo, UserRepository userRepo) {
 		this.ingredientRepo = ingredientRepo;
 		this.tacoRepo = tacoRepo;
+		this.userRepo = userRepo;
 	}
 	
 	@GetMapping
-	public String showDesignForm(Model model) {
+	public String showDesignForm(Model model, Principal principal) {
 		List<Ingredient> ingredients = new ArrayList<>();
 		ingredientRepo.findAll().forEach(i -> ingredients.add(i));
 		
@@ -50,7 +56,9 @@ public class DesignTacoController {
 		for (Type type : types) {
 			model.addAttribute(type.toString().toLowerCase(), filterByType(ingredients, type));
 		}
-		model.addAttribute("taco", new Taco());
+		String username = principal.getName();
+		User user = userRepo.findByUsername(username);
+		model.addAttribute("user", user);
 		return "design";
 	}
 
